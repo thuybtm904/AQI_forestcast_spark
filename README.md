@@ -4,7 +4,7 @@ Hệ thống dự báo chất lượng không khí (AQI / PM2.5) tại Hà Nội
 
 ---
 
-## 📋 Mục lục
+## Mục lục
 
 - [Tổng quan](#tổng-quan)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
@@ -192,19 +192,6 @@ Pressure, Precipitation, BLH, Wind_Direction, NO2, PM10, Clouds
 
 ```bash
 python predict_service.py
-```
-
-Output mong đợi:
-
-```
-[2025-04-18 06:00] Đọc CSV: data/hanoi_aqi.csv
-  387 hàng, thời điểm cuối: 2025-04-18 05:00:00
-
-Chạy predictions cho 17 horizons...
-  K= 1h → PM2.5=28.3 µg/m³  AQI=84
-  K= 4h → PM2.5=31.1 µg/m³  AQI=91
-  ...
-✅ Đã ghi 17 slots → data/forecast.json
 ```
 
 ### Bước 3 — Build lịch sử
