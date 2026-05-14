@@ -1,0 +1,334 @@
+{
+  "generated_at": "2026-05-12T07:51:14.464192",
+  "base_ts": "2026-05-12 06:00:00",
+  "slots": [
+    {
+      "K": 19,
+      "pm25": 33.34,
+      "aqi": 96,
+      "forecast_dt": "2026-05-13T01:00:00",
+      "display_dt": "13/05 00h",
+      "display_full": "Wednesday, 13/05/2026 00:00",
+      "hour_str": "00:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Trung bình",
+      "css_class": "moderate",
+      "color": "#ffca28"
+    },
+    {
+      "K": 22,
+      "pm25": 24.51,
+      "aqi": 77,
+      "forecast_dt": "2026-05-13T04:00:00",
+      "display_dt": "13/05 03h",
+      "display_full": "Wednesday, 13/05/2026 03:00",
+      "hour_str": "03:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Trung bình",
+      "css_class": "moderate",
+      "color": "#ffca28"
+    },
+    {
+      "K": 25,
+      "pm25": 32.53,
+      "aqi": 94,
+      "forecast_dt": "2026-05-13T07:00:00",
+      "display_dt": "13/05 06h",
+      "display_full": "Wednesday, 13/05/2026 06:00",
+      "hour_str": "06:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Trung bình",
+      "css_class": "moderate",
+      "color": "#ffca28"
+    },
+    {
+      "K": 28,
+      "pm25": 37.6,
+      "aqi": 106,
+      "forecast_dt": "2026-05-13T10:00:00",
+      "display_dt": "13/05 09h",
+      "display_full": "Wednesday, 13/05/2026 09:00",
+      "hour_str": "09:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 31,
+      "pm25": 35.65,
+      "aqi": 101,
+      "forecast_dt": "2026-05-13T13:00:00",
+      "display_dt": "13/05 12h",
+      "display_full": "Wednesday, 13/05/2026 12:00",
+      "hour_str": "12:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 34,
+      "pm25": 37.19,
+      "aqi": 105,
+      "forecast_dt": "2026-05-13T16:00:00",
+      "display_dt": "13/05 15h",
+      "display_full": "Wednesday, 13/05/2026 15:00",
+      "hour_str": "15:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 37,
+      "pm25": 47.51,
+      "aqi": 131,
+      "forecast_dt": "2026-05-13T19:00:00",
+      "display_dt": "13/05 18h",
+      "display_full": "Wednesday, 13/05/2026 18:00",
+      "hour_str": "18:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 40,
+      "pm25": 47.29,
+      "aqi": 130,
+      "forecast_dt": "2026-05-13T22:00:00",
+      "display_dt": "13/05 21h",
+      "display_full": "Wednesday, 13/05/2026 21:00",
+      "hour_str": "21:00",
+      "date_str": "13/05",
+      "day_index": 0,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 43,
+      "pm25": 94.33,
+      "aqi": 171,
+      "forecast_dt": "2026-05-14T01:00:00",
+      "display_dt": "14/05 00h",
+      "display_full": "Thursday, 14/05/2026 00:00",
+      "hour_str": "00:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Xấu",
+      "css_class": "unhealthy",
+      "color": "#f44336"
+    },
+    {
+      "K": 46,
+      "pm25": 45.61,
+      "aqi": 126,
+      "forecast_dt": "2026-05-14T04:00:00",
+      "display_dt": "14/05 03h",
+      "display_full": "Thursday, 14/05/2026 03:00",
+      "hour_str": "03:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 49,
+      "pm25": 56.62,
+      "aqi": 152,
+      "forecast_dt": "2026-05-14T07:00:00",
+      "display_dt": "14/05 06h",
+      "display_full": "Thursday, 14/05/2026 06:00",
+      "hour_str": "06:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Xấu",
+      "css_class": "unhealthy",
+      "color": "#f44336"
+    },
+    {
+      "K": 16,
+      "pm25": 34.52,
+      "aqi": 98,
+      "forecast_dt": "2026-05-12T22:00:00",
+      "display_dt": "14/05 09h",
+      "display_full": "Thursday, 14/05/2026 09:00",
+      "hour_str": "09:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Trung bình",
+      "css_class": "moderate",
+      "color": "#ffca28"
+    },
+    {
+      "K": 13,
+      "pm25": 38.73,
+      "aqi": 109,
+      "forecast_dt": "2026-05-12T19:00:00",
+      "display_dt": "14/05 12h",
+      "display_full": "Thursday, 14/05/2026 12:00",
+      "hour_str": "12:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 10,
+      "pm25": 40.23,
+      "aqi": 113,
+      "forecast_dt": "2026-05-12T16:00:00",
+      "display_dt": "14/05 15h",
+      "display_full": "Thursday, 14/05/2026 15:00",
+      "hour_str": "15:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 7,
+      "pm25": 36.55,
+      "aqi": 104,
+      "forecast_dt": "2026-05-12T13:00:00",
+      "display_dt": "14/05 18h",
+      "display_full": "Thursday, 14/05/2026 18:00",
+      "hour_str": "18:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Kém",
+      "css_class": "poor",
+      "color": "#ff6f00"
+    },
+    {
+      "K": 4,
+      "pm25": 26.42,
+      "aqi": 81,
+      "forecast_dt": "2026-05-12T10:00:00",
+      "display_dt": "14/05 21h",
+      "display_full": "Thursday, 14/05/2026 21:00",
+      "hour_str": "21:00",
+      "date_str": "14/05",
+      "day_index": 1,
+      "label": "Trung bình",
+      "css_class": "moderate",
+      "color": "#ffca28"
+    }
+  ],
+  "raw_predictions": [
+    {
+      "K": 1,
+      "pm25": 41.98,
+      "aqi": 117,
+      "forecast_dt": "2026-05-12T07:00:00"
+    },
+    {
+      "K": 4,
+      "pm25": 26.42,
+      "aqi": 81,
+      "forecast_dt": "2026-05-12T10:00:00"
+    },
+    {
+      "K": 7,
+      "pm25": 36.55,
+      "aqi": 104,
+      "forecast_dt": "2026-05-12T13:00:00"
+    },
+    {
+      "K": 10,
+      "pm25": 40.23,
+      "aqi": 113,
+      "forecast_dt": "2026-05-12T16:00:00"
+    },
+    {
+      "K": 13,
+      "pm25": 38.73,
+      "aqi": 109,
+      "forecast_dt": "2026-05-12T19:00:00"
+    },
+    {
+      "K": 16,
+      "pm25": 34.52,
+      "aqi": 98,
+      "forecast_dt": "2026-05-12T22:00:00"
+    },
+    {
+      "K": 19,
+      "pm25": 33.34,
+      "aqi": 96,
+      "forecast_dt": "2026-05-13T01:00:00"
+    },
+    {
+      "K": 22,
+      "pm25": 24.51,
+      "aqi": 77,
+      "forecast_dt": "2026-05-13T04:00:00"
+    },
+    {
+      "K": 25,
+      "pm25": 32.53,
+      "aqi": 94,
+      "forecast_dt": "2026-05-13T07:00:00"
+    },
+    {
+      "K": 28,
+      "pm25": 37.6,
+      "aqi": 106,
+      "forecast_dt": "2026-05-13T10:00:00"
+    },
+    {
+      "K": 31,
+      "pm25": 35.65,
+      "aqi": 101,
+      "forecast_dt": "2026-05-13T13:00:00"
+    },
+    {
+      "K": 34,
+      "pm25": 37.19,
+      "aqi": 105,
+      "forecast_dt": "2026-05-13T16:00:00"
+    },
+    {
+      "K": 37,
+      "pm25": 47.51,
+      "aqi": 131,
+      "forecast_dt": "2026-05-13T19:00:00"
+    },
+    {
+      "K": 40,
+      "pm25": 47.29,
+      "aqi": 130,
+      "forecast_dt": "2026-05-13T22:00:00"
+    },
+    {
+      "K": 43,
+      "pm25": 94.33,
+      "aqi": 171,
+      "forecast_dt": "2026-05-14T01:00:00"
+    },
+    {
+      "K": 46,
+      "pm25": 45.61,
+      "aqi": 126,
+      "forecast_dt": "2026-05-14T04:00:00"
+    },
+    {
+      "K": 49,
+      "pm25": 56.62,
+      "aqi": 152,
+      "forecast_dt": "2026-05-14T07:00:00"
+    }
+  ]
+}

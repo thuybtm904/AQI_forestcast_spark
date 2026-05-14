@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phân tích lịch sử AQI · Hà Nội</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f0f2f8;--surface:#fff;--surface2:#f8f9fc;
+  --border:#e4e8f0;--border2:#d0d7e6;
+  --txt1:#0d1526;--txt2:#3d4f6e;--txt3:#7a8aaa;
+  --blue:#2563eb;--blue-light:#dbeafe;
+  --shadow:0 2px 12px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);
+  --r:16px;
+}
+body.dark{
+  --bg:#080c14;--surface:#0f1520;--surface2:#141c2b;
+  --border:#1e2d44;--border2:#263449;
+  --txt1:#e8edf8;--txt2:#9aaac8;--txt3:#5a6e90;
+  --blue-light:#1e3a5f;
+  --shadow:0 2px 12px rgba(0,0,0,.3);
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt1);min-height:100vh}
+
+/* NAV */
+nav{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.3px;text-decoration:none;color:var(--txt1)}
+.nav-brand-icon{width:30px;height:30px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:6px 16px;border-radius:8px;font-size:16px;font-weight:500;text-decoration:none;color:var(--txt3);transition:all .15s}
+.nav-link:hover{background:var(--surface2);color:var(--txt1)}
+.nav-link.active{background:var(--blue-light);color:var(--blue)}
+.theme-pill{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px}
+.theme-pill button{padding:4px 12px;border-radius:6px;border:none;background:transparent;font-size:14px;font-weight:500;color:var(--txt3);cursor:pointer;transition:all .15s}
+.theme-pill button.active{background:var(--surface);color:var(--txt1);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+/* PAGE */
+.page{max-width:1280px;margin:0 auto;padding:28px 24px 64px}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:26px;font-weight:600;letter-spacing:-.4px;margin-bottom:4px}
+.page-header p{font-size:13px;color:var(--txt3)}
+
+/* FILTER DROPDOWN */
+.filter-dd-wrap{position:relative;display:flex;justify-content:flex-end;margin-bottom:24px}
+.filter-dd-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--txt2);cursor:pointer;white-space:nowrap;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.filter-dd-btn:hover{border-color:var(--border2);color:var(--txt1)}
+.filter-dd-btn.open{border-color:var(--blue);color:var(--blue)}
+.filter-dd-chevron{transition:transform .2s;font-style:normal}
+.filter-dd-btn.open .filter-dd-chevron{transform:rotate(180deg);display:inline-block}
+.filter-dd-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;min-width:140px;box-shadow:0 8px 24px rgba(0,0,0,.10);z-index:200;display:none}
+.filter-dd-menu.show{display:block}
+.filter-dd-item{display:block;width:100%;padding:7px 14px;border-radius:7px;border:none;background:transparent;font-size:13px;font-weight:500;color:var(--txt3);cursor:pointer;text-align:left;transition:all .15s;white-space:nowrap}
+.filter-dd-item:hover{background:var(--surface2);color:var(--txt1)}
+.filter-dd-item.active{background:var(--blue);color:#fff}
+.filter-dd-divider{height:1px;background:var(--border);margin:4px 6px}
+
+/* SUMMARY */
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.sum-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.sum-label{font-size:11px;font-weight:600;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.sum-value{font-size:32px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px}
+.sum-sub{font-size:11px;color:var(--txt3);margin-top:4px}
+.sum-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;margin-top:6px}
+
+/* CHART CARD */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:12px;flex-wrap:wrap}
+.chart-title{font-size:18px;font-weight:600;color:var(--txt1)}
+.chart-desc{font-size:11px;color:var(--txt3);margin-top:2px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+
+/* PILL GROUP (sub-tabs inside chart) */
+.pill-group{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px}
+.pill-btn{padding:4px 11px;border-radius:6px;border:none;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--txt3);transition:all .15s;white-space:nowrap}
+.pill-btn.active{background:var(--surface);color:var(--txt1);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* CALENDAR HEATMAP — month×DOW layout */
+.cal-year-block{margin-bottom:28px}
+.cal-year-label{font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.cal-year-stat{font-size:12px;font-weight:500}
+/* New month-column grid */
+.cal-grid{display:flex;gap:4px;width:100%}
+.cal-dow-col{display:flex;flex-direction:column;gap:0;padding-top:22px;flex-shrink:0;width:22px}
+.cal-dow-lbl{height:16px;font-size:9px;color:var(--txt3);display:flex;align-items:center;font-family:'JetBrains Mono',monospace}
+.cal-months-area{display:flex;gap:3px;flex:1;min-width:0}
+.cal-month-col{display:flex;flex-direction:column;flex:1;min-width:0}
+.cal-month-name{font-size:9px;color:var(--txt3);font-weight:600;height:20px;display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+.cal-month-avg{font-size:8px;color:var(--txt3);height:14px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace}
+.cal-month-days{display:flex;flex-direction:column;gap:2px}
+.cal-dow-row{display:flex;gap:2px}
+.cal-cell{flex:1;min-width:0;height:14px;border-radius:2px;cursor:default;transition:transform .1s;position:relative}
+.cal-cell:hover{transform:scale(1.6);z-index:20}
+.cal-cell.empty-cell{background:transparent!important}
+
+/* YEAR DAYS TABLE */
+.yd-table{width:100%;border-collapse:collapse;font-size:13px}
+.yd-table th{padding:8px 12px;font-size:13px;font-weight:600;color:var(--txt3);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.yd-table td{padding:7px 12px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace}
+.yd-table tr:last-child td{border-bottom:none}
+.yd-bar-cell{min-width:80px}
+.yd-bar-wrap{background:var(--surface2);border-radius:4px;height:14px;overflow:hidden;display:flex}
+.yd-bar-seg{height:100%}
+
+/* DAY/NIGHT CARD */
+.daynight-wrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.dn-card{border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+.dn-card.day{background:linear-gradient(135deg,#fef9c3,#fde68a)}
+.dn-card.night{background:linear-gradient(135deg,#1e3a5f,#0f2540)}
+body.dark .dn-card.day{background:linear-gradient(135deg,#3d2a00,#5a3d00)}
+.dn-title{font-size:12px;font-weight:600;opacity:.7;margin-bottom:10px}
+.dn-card.night .dn-title{color:#93c5fd}
+.dn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dn-item{}
+.dn-item-label{font-size:10px;font-weight:600;opacity:.6;margin-bottom:2px}
+.dn-card.night .dn-item-label{color:#93c5fd}
+.dn-item-time{font-size:12px;font-weight:600;margin-bottom:2px}
+.dn-card.night .dn-item-time{color:#e0f2fe}
+.dn-item-val{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.dn-sun{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.3}
+
+/* MULTI-YEAR */
+.yr-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.yr-dot{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.yr-dot.off{opacity:.25}
+.yr-dot-circle{width:10px;height:10px;border-radius:50%}
+
+/* DIST - vertical bar chart */
+.dist-chart-wrap { display: flex; align-items: flex-end; gap: 10px; height: 310px; padding: 0 4px; }
+.dist-col { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; height: 100%; justify-content: flex-end; }
+.dist-bar-v { width: 100%; border-radius: 8px 8px 0 0; transition: height .6s cubic-bezier(.4,0,.2,1); min-height: 4px; position: relative; display: flex; justify-content: center; }
+.dist-bar-pct { position: absolute; top: -20px; font-size: 10px; font-weight: 700; color: var(--txt2); white-space: nowrap; }
+.dist-lbl-v { font-size: 11px; font-weight: 600; text-align: center; line-height: 1.3; }
+.dist-cnt-v { font-size: 10px; color: var(--txt3); }
+.dist-cnt{font-size:11px;color:var(--txt3);width:58px;text-align:right;flex-shrink:0}
+
+/* SECTION INSIGHT */
+.section-insight{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:13px;color:var(--txt2);line-height:1.7;}
+.section-insight p{margin-bottom:6px;}
+.section-insight p:last-child{margin-bottom:0;}
+.section-insight strong{color:var(--txt1);font-weight:600;}
+
+@media(max-width:900px){.summary-row{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
+@media(max-width:600px){nav{padding:0 16px}.page{padding:16px 12px 48px}.summary-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <a class="nav-brand" href="/">
+      AQI Forecast · Hà Nội
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="/">Dự báo</a>
+      <a class="nav-link active" href="/analytics/">Lịch sử</a>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="theme-pill" id="themeToggle">
+      <button class="active" data-t="light">☀️</button>
+      <button data-t="dark">🌙</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Phân tích lịch sử chất lượng không khí</h1>
+  </div>
+
+  <!-- FILTER DROPDOWN -->
+  <div class="filter-dd-wrap" id="filterDdWrap">
+    <button class="filter-dd-btn" id="filterDdBtn">
+      <span id="filterDdLabel">30 ngày</span>
+      <span class="filter-dd-chevron">▾</span>
+    </button>
+    <div class="filter-dd-menu" id="filterDdMenu">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-row" id="summaryRow"></div>
+
+  <!-- ① AQI TREND (line chart, main) -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div>
+        <div class="chart-title">Xu hướng AQI theo ngày</div>
+      </div>
+      <div class="pill-group" id="metricTabs">
+        <button class="pill-btn active" data-m="AQI">AQI</button>
+        <button class="pill-btn" data-m="PM25">PM2.5</button>
+        <button class="pill-btn" data-m="PM10">PM10</button>
+        <button class="pill-btn" data-m="NO2">NO2</button>
+        <button class="pill-btn" data-m="O3">O3</button>
+      </div>
+    </div>
+    <canvas id="trendChart" height="75"></canvas>
+    <div class="section-insight" id="insightTrend"></div>
+  </div>
+
+  <!-- ② MULTI-YEAR COMPARISON -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div>
+        <div class="chart-title">So sánh AQI theo tháng — nhiều năm</div>
+      </div>
+      <div class="pill-group" id="compareMonthTabs">
+        <button class="pill-btn active" data-m="all">Cả năm</button>
+        <button class="pill-btn" data-m="1">T1</button><button class="pill-btn" data-m="2">T2</button>
+        <button class="pill-btn" data-m="3">T3</button><button class="pill-btn" data-m="4">T4</button>
+        <button class="pill-btn" data-m="5">T5</button><button class="pill-btn" data-m="6">T6</button>
+        <button class="pill-btn" data-m="7">T7</button><button class="pill-btn" data-m="8">T8</button>
+        <button class="pill-btn" data-m="9">T9</button><button class="pill-btn" data-m="10">T10</button>
+        <button class="pill-btn" data-m="11">T11</button><button class="pill-btn" data-m="12">T12</button>
+      </div>
+    </div>
+    <div class="yr-legend" id="yrLegend"></div>
+    <canvas id="compareChart" height="75"></canvas>
+    <div class="section-insight" id="insightCompare"></div>
+  </div>
+
+  <!-- ③ CALENDAR HEATMAP + DAYS TABLE -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div><div class="chart-title">AQI theo ngày</div></div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:3px;font-size:11px;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;display:inline-block"></span>Tốt</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:11px;"><span style="width:10px;height:10px;border-radius:2px;background:#facc15;display:inline-block"></span>TB</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:11px;"><span style="width:10px;height:10px;border-radius:2px;background:#f97316;display:inline-block"></span>Kém</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:11px;"><span style="width:10px;height:10px;border-radius:2px;background:#ef4444;display:inline-block"></span>Xấu</span>
+        <span style="display:flex;align-items:center;gap:3px;font-size:11px;"><span style="width:10px;height:10px;border-radius:2px;background:#a855f7;display:inline-block"></span>Rất xấu</span>
+      </div>
+    </div>
+
+    <!-- Year + Metric selectors -->
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;">
+      <div class="pill-group" id="calYearTabs"></div>
+      <div class="pill-group" id="calMetricTabs">
+        <button class="pill-btn active" data-m="AQI">AQI</button>
+        <button class="pill-btn" data-m="PM25">PM2.5</button>
+        <button class="pill-btn" data-m="PM10">PM10</button>
+        <button class="pill-btn" data-m="NO2">NO₂</button>
+        <button class="pill-btn" data-m="O3">O₃</button>
+      </div>
+    </div>
+
+    <div id="calContainer"></div>
+
+    <!-- Days breakdown table -->
+    <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:14px;">Số ngày theo mức AQI</div>
+      <div style="overflow-x:auto;" id="ydTableWrap"></div>
+    </div>
+  </div>
+
+  <!-- ④ 24H LINE + DAY/NIGHT CARDS -->
+  <div class="chart-card">
+    <div class="chart-head">
+      <div>
+        <div class="chart-title">AQI trung bình theo giờ trong ngày</div>
+      </div>
+      <div class="pill-group" id="h24YearTabs"></div>
+    </div>
+    <div class="daynight-wrap" id="dnCards"></div>
+    <canvas id="h24Chart" height="80"></canvas>
+    <div class="section-insight" id="insight24h"></div>
+  </div>
+
+  <!-- ⑤ DISTRIBUTION + SCATTER -->
+<div class="two-col">
+
+<div class="chart-card" style="margin-bottom:0; min-height:420px">
+        <div class="chart-head">
+      <div class="chart-title">Phân bố mức độ AQI</div>
+    </div>
+    <div id="distBars"></div>
+  </div>
+
+<div class="chart-card" style="margin-bottom:0; min-height:420px">
+        <div class="chart-head">
+      <div class="chart-title">Tương quan PM2.5 và AQI</div>
+    </div>
+    <canvas id="scatterChart" height="180"></canvas>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const dailyData  = {{ history_json|safe }};
+const hourlyData = {{ hourly_json|safe }};
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const YEAR_COLORS = {'2022':'#f97316','2023':'#2563eb','2024':'#7c3aed','2025':'#059669','2026':'#dc2626'};
+const MONTHS_VI   = ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'];
+const DOWS_VI     = ['CN','T2','T3','T4','T5','T6','T7'];
+const METRIC_META = {
+  AQI:  {label:'AQI',       unit:'',       color:'#2563eb'},
+  PM25: {label:'PM2.5',     unit:'µg/m³',  color:'#ea580c'},
+  PM10: {label:'PM10',      unit:'µg/m³',  color:'#7c3aed'},
+  NO2:  {label:'NO2',       unit:'µg/m³',  color:'#0891b2'},
+  O3:   {label:'O3',        unit:'µg/m³',  color:'#059669'},
+};
+const AQI_LEVELS = [
+  {label:'Tốt',       range:[0,50],   color:'#22c55e'},
+  {label:'Trung bình',range:[51,100], color:'#facc15'},
+  {label:'Kém',       range:[101,150],color:'#f97316'},
+  {label:'Xấu',       range:[151,200],color:'#ef4444'},
+  {label:'Rất xấu',   range:[201,300],color:'#a855f7'},
+  {label:'Nguy hại',  range:[301,999],color:'#7f1d1d'},
+];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function aqiColor(v){
+  if(v==null)return'#94a3b8';
+  if(v<=50)return'#22c55e';if(v<=100)return'#facc15';
+  if(v<=150)return'#f97316';if(v<=200)return'#ef4444';
+  if(v<=300)return'#a855f7';return'#7f1d1d';
+}
+function pollutantColor(met, v){
+  if(v==null) return '#94a3b8';
+  if(met==='AQI')  return aqiColor(v);
+  if(met==='PM25'){ if(v<=12)return'#22c55e';if(v<=35.4)return'#facc15';if(v<=55.4)return'#f97316';if(v<=150.4)return'#ef4444';if(v<=250.4)return'#a855f7';return'#7f1d1d'; }
+  if(met==='PM10'){ if(v<=45)return'#22c55e';if(v<=75)return'#facc15';if(v<=150)return'#f97316';if(v<=250)return'#ef4444';return'#a855f7'; }
+  if(met==='NO2'){  if(v<=25)return'#22c55e';if(v<=50)return'#facc15';if(v<=100)return'#f97316';if(v<=200)return'#ef4444';return'#a855f7'; }
+  if(met==='O3'){   if(v<=60)return'#22c55e';if(v<=100)return'#facc15';if(v<=160)return'#f97316';if(v<=240)return'#ef4444';return'#a855f7'; }
+  return (METRIC_META[met]&&METRIC_META[met].color)||'#94a3b8';
+}
+function aqiLabel(v){
+  if(v==null)return'—';if(v<=50)return'Tốt';if(v<=100)return'Trung bình';
+  if(v<=150)return'Kém';if(v<=200)return'Xấu';if(v<=300)return'Rất xấu';return'Nguy hại';
+}
+function avg(arr){
+  const v=arr.filter(x=>x!=null&&!isNaN(x));
+  return v.length?+(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1):null;
+}
+function roll7(arr){
+  return arr.map((_,i)=>avg(arr.slice(Math.max(0,i-3),i+4).filter(x=>x!=null)));
+}
+const isDark=()=>document.body.classList.contains('dark');
+function tc(){return{grid:isDark()?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)',text:isDark()?'#5a6e90':'#7a8aaa',title:isDark()?'#e8edf8':'#0d1526',bg:isDark()?'#0f1520':'#ffffff'};}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let curRange   = 30;
+let curYear    = null;  // null = use range
+let curMetric  = 'AQI';
+let curCompMon = 'all';
+let cur24Year  = null;
+let curCalYear = null;  // calendar selected year
+let curCalMet  = 'AQI'; // calendar selected metric
+let hiddenYrs  = new Set();
+let charts     = {};
+
+const allYears = [...new Set(dailyData.map(d=>d.date.slice(0,4)))].sort();
+cur24Year  = allYears[allYears.length-1];
+curCalYear = allYears[allYears.length-1];
+
+function getSlice(){
+  if(curYear) return dailyData.filter(d=>d.date.startsWith(curYear));
+  if(curRange===0) return dailyData;
+  return dailyData.slice(-curRange);
+}
+
+// ── INJECT FILTER DROPDOWN ────────────────────────────────────────────────────
+(function(){
+  const menu=document.getElementById('filterDdMenu');
+  const btn=document.getElementById('filterDdBtn');
+  const label=document.getElementById('filterDdLabel');
+  function setActive(item){menu.querySelectorAll('.filter-dd-item').forEach(x=>x.classList.remove('active'));item.classList.add('active');}
+  function closeMenu(){menu.classList.remove('show');btn.classList.remove('open');}
+  // Range options
+  [{r:30,t:'30 ngày'},{r:60,t:'60 ngày'},{r:90,t:'90 ngày'},{r:180,t:'6 tháng'}].forEach(({r,t},i)=>{
+    const b=document.createElement('button');
+    b.className='filter-dd-item'+(i===0?' active':'');b.textContent=t;
+    b.addEventListener('click',function(){setActive(b);label.textContent=t;closeMenu();curYear=null;curRange=r;rebuildAll();});
+    menu.appendChild(b);
+  });
+  // Divider
+  const divEl=document.createElement('div');divEl.className='filter-dd-divider';menu.appendChild(divEl);
+  // Year options
+  allYears.slice().reverse().forEach(yr=>{
+    const b=document.createElement('button');
+    b.className='filter-dd-item';b.textContent=yr;
+    b.addEventListener('click',function(){setActive(b);label.textContent=yr;closeMenu();curYear=yr;curRange=0;rebuildAll();});
+    menu.appendChild(b);
+  });
+  // Toggle
+  btn.addEventListener('click',function(e){e.stopPropagation();const o=menu.classList.contains('show');menu.classList.toggle('show',!o);btn.classList.toggle('open',!o);});
+  document.addEventListener('click',closeMenu);
+  // cal year tabs
+  const calYr=document.getElementById('calYearTabs');
+  allYears.slice().reverse().forEach(yr=>{
+    const b=document.createElement('button');
+    b.className='pill-btn'+(yr===curCalYear?' active':'');
+    b.dataset.yr=yr;b.textContent=yr;calYr.appendChild(b);
+  });
+  // 24h year tabs
+  const h24=document.getElementById('h24YearTabs');
+  allYears.forEach(yr=>{
+    const b=document.createElement('button');
+    b.className='pill-btn'+(yr===cur24Year?' active':'');
+    b.dataset.yr=yr;b.textContent=yr;h24.appendChild(b);
+  });
+})();
+
+// ── CHART FACTORY ─────────────────────────────────────────────────────────────
+function mkLine(id,labels,datasets,opts={}){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+  const el=document.getElementById(id);if(!el)return;
+  const t=tc();
+  charts[id]=new Chart(el.getContext('2d'),{
+    type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:true,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:opts.legend===false?{display:false}:{display:true,labels:{color:t.text,usePointStyle:true,pointStyleWidth:8,font:{size:12}}},
+        tooltip:{backgroundColor:t.bg,borderColor:isDark()?'#1e2d44':'#e4e8f0',borderWidth:1,titleColor:t.title,bodyColor:t.text,callbacks:opts.ttCb||undefined}
+      },
+      scales:{
+        x:{ticks:{color:t.text,maxTicksLimit:opts.maxTx||10,font:{size:11}},grid:{color:t.grid}},
+        y:{ticks:{color:t.text,font:{size:11}},grid:{color:t.grid},
+           min:opts.yMin,
+           title:opts.yTitle?{display:true,text:opts.yTitle,color:t.text,font:{size:11}}:undefined}
+      },...(opts.extra||{})}
+  });
+  return charts[id];
+}
+
+// ── ① TREND ───────────────────────────────────────────────────────────────────
+function buildTrend(){
+  const d=getSlice();
+  const labels=d.map(x=>x.date.slice(5).replace('-','/'));
+  const meta=METRIC_META[curMetric]||METRIC_META.AQI;
+  const vals=d.map(x=>x[curMetric]);
+  const el=document.getElementById('trendChart');if(!el)return;
+  const ctx=el.getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,260);
+  grad.addColorStop(0,meta.color+'40');grad.addColorStop(1,meta.color+'04');
+  const t=tc();
+  mkLine('trendChart',labels,[{
+    label:meta.label,data:vals,borderColor:meta.color,borderWidth:2,
+    pointBackgroundColor:curMetric==='AQI'?vals.map(v=>aqiColor(v)):meta.color,
+    pointBorderColor:t.bg,pointBorderWidth:1.5,
+    pointRadius:d.length>120?0:3,pointHoverRadius:6,
+    fill:true,backgroundColor:grad,tension:0.35,
+  }],{yTitle:`${meta.label}${meta.unit?' ('+meta.unit+')':''}`,yMin:0,legend:false,maxTx:d.length>180?8:10});
+}
+
+// ── SUMMARY ───────────────────────────────────────────────────────────────────
+function buildSummary(){
+  const d=getSlice();
+  const aqis=d.map(x=>x.AQI).filter(Boolean);
+  if(!aqis.length){document.getElementById('summaryRow').innerHTML='';return;}
+  const a=avg(aqis),mx=Math.max(...aqis),mn=Math.min(...aqis);
+  const bad=aqis.filter(v=>v>150).length;
+  const pct=(bad/aqis.length*100).toFixed(0);
+  const last7=avg(aqis.slice(-7)),prev7=avg(aqis.slice(-14,-7));
+  const trend=last7&&prev7?+(last7-prev7).toFixed(1):0;
+  const ti=trend>2?'↑':trend<-2?'↓':'→',tc2=trend>2?'#dc2626':trend<-2?'#16a34a':'var(--txt3)';
+  const periodLabel=curYear?`Năm ${curYear}`:curRange===0?'Tất cả':''+curRange+' ngày gần nhất';
+  const cards=[
+    {label:'AQI trung bình',value:a,color:aqiColor(a),sub:periodLabel,badge:aqiLabel(a),bc:aqiColor(a)},
+    {label:'AQI cao nhất',  value:mx,color:'#dc2626',sub:'trong kỳ',badge:aqiLabel(mx),bc:aqiColor(mx)},
+    {label:'AQI thấp nhất', value:mn,color:'#16a34a',sub:'trong kỳ',badge:aqiLabel(mn),bc:aqiColor(mn)},
+    {label:'Ngày AQI > 150',value:bad,color:'#ea580c',sub:`${pct}% tổng số ngày`,
+     extra:`<span style="font-size:13px;font-weight:600;color:${tc2};">${ti} ${trend>0?'+':''}${trend} vs tuần trước</span>`},
+  ];
+  document.getElementById('summaryRow').innerHTML=cards.map(c=>`
+    <div class="sum-card">
+      <div class="sum-label">${c.label}</div>
+      <div class="sum-value" style="color:${c.color}">${c.value??'—'}</div>
+      <div class="sum-sub">${c.sub}</div>
+      ${c.badge?`<span class="sum-badge" style="background:${c.bc}22;color:${c.bc};">${c.badge}</span>`:''}
+      ${c.extra||''}
+    </div>`).join('');
+}
+
+// ── PER-SECTION INSIGHTS ─────────────────────────────────────────────────────
+function setInsight(id, html){
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=html;
+}
+
+function buildInsightTrend(){
+  const d=getSlice();
+  const aqis=d.map(x=>x.AQI).filter(Boolean);
+  if(!aqis.length){setInsight('insightTrend','');return;}
+  const a=avg(aqis);
+  const last7=avg(aqis.slice(-7)), prev7=avg(aqis.slice(-14,-7));
+  const diff=last7&&prev7?+(last7-prev7).toFixed(1):null;
+  const meta=METRIC_META[curMetric]||METRIC_META.AQI;
+  const periodLabel=curYear?`năm ${curYear}`:curRange===0?'toàn bộ dữ liệu':`${curRange} ngày qua`;
+  let txt=`<p>Trong ${periodLabel}, ${meta.label} trung bình đạt <strong>${a}</strong> — mức <strong>${aqiLabel(a)}</strong>.`;
+  if(diff!==null && Math.abs(diff)>1)
+    txt+=` 7 ngày gần đây ${diff>0?'cao hơn':'thấp hơn'} tuần trước <strong>${Math.abs(diff)}</strong> điểm.`;
+  txt+='</p>';
+  const bad=aqis.filter(v=>v>150).length;
+  if(bad>0){
+    const pct=(bad/aqis.length*100).toFixed(0);
+    txt+=`<p>Có <strong>${bad} ngày</strong> (${pct}%) vượt ngưỡng Xấu trong kỳ này.</p>`;
+  }
+  setInsight('insightTrend', txt);
+}
+
+function buildInsightCompare(){
+  const yrAvgs=allYears.map(yr=>{
+    const vals=dailyData.filter(d=>d.date.startsWith(yr)).map(d=>d.AQI).filter(Boolean);
+    return{yr, a:avg(vals)};
+  }).filter(x=>x.a!=null);
+  if(!yrAvgs.length){setInsight('insightCompare','');return;}
+  const worst=yrAvgs.reduce((a,b)=>a.a>b.a?a:b);
+  const best=yrAvgs.reduce((a,b)=>a.a<b.a?a:b);
+  let txt=`<p>Trong các năm có dữ liệu, <strong>${worst.yr}</strong> ghi nhận AQI trung bình cao nhất (<strong>${worst.a}</strong>), còn <strong>${best.yr}</strong> có mức thấp nhất (<strong>${best.a}</strong>).`;
+  const monAvgs={};
+  dailyData.forEach(d=>{
+    const m=d.date.slice(0,7);
+    if(!monAvgs[m]) monAvgs[m]=[];
+    if(d.AQI) monAvgs[m].push(d.AQI);
+  });
+  const monList=Object.entries(monAvgs).map(([m,v])=>({m,a:avg(v)})).filter(x=>x.a);
+  if(monList.length){
+    const worstMon=monList.reduce((a,b)=>a.a>b.a?a:b);
+    txt+=` Tháng tệ nhất từng ghi nhận là <strong>${worstMon.m}</strong> với trung bình <strong>${worstMon.a}</strong>.</p>`;
+  } else txt+='</p>';
+  setInsight('insightCompare', txt);
+}
+
+function buildInsight24h(){
+  const rows=hourlyData.filter(d=>d.date.startsWith(cur24Year));
+  if(!rows.length){setInsight('insight24h','');return;}
+  const hourBuckets={};
+  for(let h=0;h<24;h++) hourBuckets[h]=[];
+  rows.forEach(r=>{if(r.AQI!=null) hourBuckets[r.hour].push(r.AQI);});
+  const hourAvgs=Array.from({length:24},(_,h)=>avg(hourBuckets[h]));
+  const dayHours=Array.from({length:12},(_,i)=>i+6);
+  const nightHours=[...Array.from({length:6},(_,i)=>i),...Array.from({length:6},(_,i)=>i+18)];
+  const dayVals=dayHours.map(h=>({h,v:hourAvgs[h]})).filter(x=>x.v!=null);
+  const nightVals=nightHours.map(h=>({h,v:hourAvgs[h]})).filter(x=>x.v!=null);
+  if(!dayVals.length){setInsight('insight24h','');return;}
+  const dayMax=dayVals.reduce((a,b)=>a.v>b.v?a:b);
+  const dayMin=dayVals.reduce((a,b)=>a.v<b.v?a:b);
+  const nightMax=nightVals.reduce((a,b)=>a.v>b.v?a:b,{h:0,v:0});
+  const nightMin=nightVals.reduce((a,b)=>a.v<b.v?a:b,{h:23,v:999});
+  let txt=`<p>Trong năm <strong>${cur24Year}</strong>, ban ngày AQI cao nhất thường nằm trong khoảng <strong>${dayMax.h}h – ${dayMax.h+1}h</strong> (trung bình ${dayMax.v}), trong khi AQI thấp nhất vào khoảng <strong>${dayMin.h}h – ${dayMin.h+1}h</strong> (trung bình ${dayMin.v}).</p>`;
+  if(nightVals.length) txt+=`<p>Vào ban đêm, AQI cao nhất nằm trong khoảng <strong>${nightMax.h}h</strong> (trung bình ${nightMax.v}), thấp nhất vào khoảng <strong>${nightMin.h}h</strong> (trung bình ${nightMin.v}).</p>`;
+  setInsight('insight24h', txt);
+}
+
+// ── ② MULTI-YEAR COMPARE ─────────────────────────────────────────────────────
+function buildCompare(){
+  const months=MONTHS_VI;
+
+  const leg=document.getElementById('yrLegend');
+  leg.innerHTML=allYears.map(yr=>`
+    <div class="yr-dot${hiddenYrs.has(yr)?' off':''}" data-yr="${yr}">
+      <div class="yr-dot-circle" style="background:${YEAR_COLORS[yr]||'#888'}"></div>${yr}
+    </div>`).join('');
+  leg.querySelectorAll('.yr-dot').forEach(el=>el.addEventListener('click',()=>{
+    const yr=el.dataset.yr;
+    hiddenYrs.has(yr)?hiddenYrs.delete(yr):hiddenYrs.add(yr);
+    buildCompare();
+  }));
+
+  const visibleYears=allYears.filter(yr=>!hiddenYrs.has(yr));
+
+  if(curCompMon==='all'){
+    const datasets=visibleYears.map(yr=>{
+      const rows=dailyData.filter(d=>d.date.startsWith(yr));
+      const data=months.map((_,mi)=>{
+        const vals=rows.filter(d=>parseInt(d.date.slice(5,7))===mi+1).map(d=>d.AQI).filter(v=>v!=null);
+        return vals.length?avg(vals):null;
+      });
+      return{label:yr,data,borderColor:YEAR_COLORS[yr]||'#888',borderWidth:2.5,
+        pointRadius:5,pointHoverRadius:8,tension:0.4,fill:false,spanGaps:true};
+    });
+    mkLine('compareChart',months,datasets,{yTitle:'AQI',yMin:0,legend:false,maxTx:12});
+
+  } else {
+    const mon=parseInt(curCompMon);
+    const maxDays=31;
+    const labels=Array.from({length:maxDays},(_,i)=>`Ng.${i+1}`);
+    const datasets=visibleYears.map(yr=>{
+      const rows=dailyData
+        .filter(d=>d.date.startsWith(yr)&&parseInt(d.date.slice(5,7))===mon)
+        .sort((a,b)=>a.date.localeCompare(b.date));
+      const data=Array(maxDays).fill(null);
+      rows.forEach(r=>{ data[parseInt(r.date.slice(8,10))-1]=r.AQI; });
+      return{label:yr,data,borderColor:YEAR_COLORS[yr]||'#888',borderWidth:2.5,
+        pointRadius:3,pointHoverRadius:7,tension:0.35,fill:false,spanGaps:true};
+    });
+    mkLine('compareChart',labels,datasets,{yTitle:'AQI',yMin:0,legend:false,maxTx:10});
+  }
+}
+
+// ── ③ CALENDAR HEATMAP ────────────────────────────────────────────────────────
+function buildCalendar(){
+  const yr = curCalYear;
+  const met = curCalMet;
+  const metMeta = METRIC_META[met] || METRIC_META.AQI;
+
+  const lookup = {};
+  dailyData.forEach(d => { if(d[met] != null) lookup[d.date] = d[met]; });
+
+  function cellColorFull(v) {
+    return pollutantColor(met, v);
+  }
+
+  const container = document.getElementById('calContainer');
+  container.innerHTML = '';
+
+  const yrRows = dailyData.filter(d => d.date.startsWith(yr));
+  const yrVals = yrRows.map(d => d[met]).filter(v => v != null);
+  const yrAvg = avg(yrVals);
+  const yrMax = yrVals.length ? Math.max(...yrVals) : null;
+
+  const block = document.createElement('div');
+  block.className = 'cal-year-block';
+
+  const title = document.createElement('div');
+  title.className = 'cal-year-label';
+  title.innerHTML = `${yr}
+    <span class="cal-year-stat" style="color:${cellColorFull(yrAvg)}">TB: ${yrAvg ?? 'N/A'}</span>
+    <span class="cal-year-stat" style="color:${cellColorFull(yrMax)};opacity:.7">Max: ${yrMax ?? 'N/A'}</span>
+    <span class="cal-year-stat" style="color:var(--txt3);">${yrRows.length} ngày</span>`;
+  block.appendChild(title);
+
+  const grid = document.createElement('div');
+  grid.className = 'cal-grid';
+
+  const dowCol = document.createElement('div');
+  dowCol.className = 'cal-dow-col';
+  const spacer = document.createElement('div');
+  spacer.style.height = '12px';
+  dowCol.appendChild(spacer);
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(dl => {
+    const d = document.createElement('div');
+    d.className = 'cal-dow-lbl';
+    d.textContent = dl;
+    dowCol.appendChild(d);
+  });
+  grid.appendChild(dowCol);
+
+  const monthsArea = document.createElement('div');
+  monthsArea.className = 'cal-months-area';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const alpha = isDark() ? 'cc' : '99';
+  const emptyBg = isDark() ? '#1e2d4444' : '#e2e8f044';
+
+  for(let m = 0; m < 12; m++) {
+    const mCol = document.createElement('div');
+    mCol.className = 'cal-month-col';
+
+    const mName = document.createElement('div');
+    mName.className = 'cal-month-name';
+    mName.textContent = MONTHS_VI[m];
+    mCol.appendChild(mName);
+
+    const daysInMonth = new Date(parseInt(yr), m+1, 0).getDate();
+    const firstDate = new Date(parseInt(yr), m, 1);
+    const firstDow = (firstDate.getDay() + 6) % 7;
+
+    const mVals = [];
+    for(let day=1; day<=daysInMonth; day++){
+      const ds = `${yr}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      if(lookup[ds] != null) mVals.push(lookup[ds]);
+    }
+    const mAvg = avg(mVals);
+    const mAvgEl = document.createElement('div');
+    mAvgEl.className = 'cal-month-avg';
+    mAvgEl.textContent = mAvg != null ? mAvg : '';
+    mAvgEl.style.color = mAvg != null ? cellColorFull(mAvg) : 'var(--txt3)';
+    mCol.appendChild(mAvgEl);
+
+    const daysDiv = document.createElement('div');
+    daysDiv.className = 'cal-month-days';
+
+    for(let dow = 0; dow < 7; dow++) {
+      const row = document.createElement('div');
+      row.className = 'cal-dow-row';
+
+      for(let day = 1; day <= daysInMonth; day++) {
+        const dayDow = (firstDow + day - 1) % 7;
+        if(dayDow !== dow) continue;
+        const ds = `${yr}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const val = lookup[ds];
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell';
+        if(val != null) {
+          cell.style.background = cellColorFull(val) + alpha;
+          cell.title = `${ds}: ${met} ${val}`;
+        } else {
+          cell.style.background = emptyBg;
+          cell.title = ds > today ? ds : `${ds}: N/A`;
+        }
+        row.appendChild(cell);
+      }
+
+      if(row.children.length === 0) {
+        const ph = document.createElement('div');
+        ph.className = 'cal-cell empty-cell';
+        row.appendChild(ph);
+      }
+
+      daysDiv.appendChild(row);
+    }
+    mCol.appendChild(daysDiv);
+    monthsArea.appendChild(mCol);
+  }
+
+  grid.appendChild(monthsArea);
+  block.appendChild(grid);
+  container.appendChild(block);
+
+  buildYdTable();
+}
+
+function buildYdTable(){
+  const thS=`padding:8px 12px;font-size:14px;font-weight:600;color:var(--txt3);border-bottom:1px solid var(--border);white-space:nowrap;`;
+  const tdS=`padding:7px 12px;border-bottom:1px solid var(--border);`;
+  let html=`<table class="yd-table"><thead><tr>
+    <th style="${thS}">Mức AQI</th>
+    ${allYears.map(yr=>`<th style="${thS}color:${YEAR_COLORS[yr]||'#888'};">${yr}</th>`).join('')}
+  </tr></thead><tbody>`;
+
+  AQI_LEVELS.forEach(lv=>{
+    html+=`<tr><td style="${tdS}"><span style="color:${lv.color};font-weight:600;">${lv.label}</span><span style="font-size:10px;color:var(--txt3);"> ${lv.range[0]}–${lv.range[1]===999?'500+':lv.range[1]}</span></td>`;
+    allYears.forEach(yr=>{
+      const aqis=dailyData.filter(d=>d.date.startsWith(yr)).map(d=>d.AQI).filter(Boolean);
+      const cnt=aqis.filter(v=>v>=lv.range[0]&&v<=lv.range[1]).length;
+      const pct=aqis.length?(cnt/aqis.length*100).toFixed(0):0;
+      html+=`<td style="${tdS}font-family:'JetBrains Mono',monospace;font-size:12px;"><strong style="color:${lv.color}">${cnt}</strong> <span style="color:var(--txt3);font-size:10px;">(${pct}%)</span></td>`;
+    });
+    html+='</tr>';
+  });
+
+  html+=`<tr><td style="${tdS}font-weight:600;font-size:px;">Tổng & phân bố</td>`;
+  allYears.forEach(yr=>{
+    const aqis=dailyData.filter(d=>d.date.startsWith(yr)).map(d=>d.AQI).filter(Boolean);
+    const total=aqis.length;
+    const segs=AQI_LEVELS.map(lv=>{
+      const cnt=aqis.filter(v=>v>=lv.range[0]&&v<=lv.range[1]).length;
+      return{color:lv.color,pct:total?(cnt/total*100).toFixed(1):0};
+    });
+    html+=`<td style="${tdS}"><div style="font-size:11px;color:var(--txt3);margin-bottom:4px;">${total} ngày</div>
+      <div class="yd-bar-wrap">${segs.map(s=>`<div class="yd-bar-seg" style="width:${s.pct}%;background:${s.color};" title="${s.pct}%"></div>`).join('')}</div></td>`;
+  });
+  html+='</tr></tbody></table>';
+  document.getElementById('ydTableWrap').innerHTML=html;
+}
+
+// ── ④ 24H LINE + DAY/NIGHT CARDS ─────────────────────────────────────────────
+function build24h(){
+  const rows=hourlyData.filter(d=>d.date.startsWith(cur24Year));
+  if(!rows.length){
+    document.getElementById('dnCards').innerHTML='';
+    document.getElementById('h24Chart').style.display='none';
+    return;
+  }
+  document.getElementById('h24Chart').style.display='';
+
+  const hourBuckets={};
+  for(let h=0;h<24;h++) hourBuckets[h]=[];
+  rows.forEach(r=>{if(r.AQI!=null) hourBuckets[r.hour].push(r.AQI);});
+  const hourAvgs=Array.from({length:24},(_,h)=>avg(hourBuckets[h]));
+
+  const dayHours =Array.from({length:12},(_,i)=>i+6);
+  const nightHours=[...Array.from({length:6},(_,i)=>i),...Array.from({length:6},(_,i)=>i+18)];
+
+  const dayVals   =dayHours.map(h=>({h,v:hourAvgs[h]})).filter(x=>x.v!=null);
+  const nightVals =nightHours.map(h=>({h,v:hourAvgs[h]})).filter(x=>x.v!=null);
+
+  const dayMax  =dayVals.reduce((a,b)=>a.v>b.v?a:b,{h:0,v:0});
+  const dayMin  =dayVals.reduce((a,b)=>a.v<b.v?a:b,{h:23,v:999});
+  const nightMax=nightVals.reduce((a,b)=>a.v>b.v?a:b,{h:0,v:0});
+  const nightMin=nightVals.reduce((a,b)=>a.v<b.v?a:b,{h:23,v:999});
+
+  function hStr(h){return`${h.toString().padStart(2,'0')}:00`;}
+
+  document.getElementById('dnCards').innerHTML=`
+    <div class="dn-card day">
+      <div class="dn-title">☀️ BAN NGÀY (6h – 17h)</div>
+      <div class="dn-grid">
+        <div class="dn-item">
+          <div class="dn-item-label">Cao nhất</div>
+          <div class="dn-item-time">${hStr(dayMax.h)}</div>
+          <div class="dn-item-val" style="color:${aqiColor(dayMax.v)}">${dayMax.v}</div>
+        </div>
+        <div class="dn-item">
+          <div class="dn-item-label">Thấp nhất</div>
+          <div class="dn-item-time">${hStr(dayMin.h)}</div>
+          <div class="dn-item-val" style="color:${aqiColor(dayMin.v)}">${dayMin.v}</div>
+        </div>
+      </div>
+      <div class="dn-sun">☀️</div>
+    </div>
+    <div class="dn-card night">
+      <div class="dn-title">🌙 BAN ĐÊM (18h – 5h)</div>
+      <div class="dn-grid">
+        <div class="dn-item">
+          <div class="dn-item-label">Cao nhất</div>
+          <div class="dn-item-time">${hStr(nightMax.h)}</div>
+          <div class="dn-item-val" style="color:${aqiColor(nightMax.v)}">${nightMax.v}</div>
+        </div>
+        <div class="dn-item">
+          <div class="dn-item-label">Thấp nhất</div>
+          <div class="dn-item-time">${hStr(nightMin.h)}</div>
+          <div class="dn-item-val" style="color:${aqiColor(nightMin.v)}">${nightMin.v}</div>
+        </div>
+      </div>
+      <div class="dn-sun">🌙</div>
+    </div>`;
+
+  const labels=Array.from({length:24},(_,h)=>hStr(h));
+  const t=tc();
+  const el=document.getElementById('h24Chart');
+  const ctx=el.getContext('2d');
+  const gDay=ctx.createLinearGradient(0,0,0,250);
+  gDay.addColorStop(0,'rgba(251,191,36,.35)');gDay.addColorStop(1,'rgba(251,191,36,.02)');
+  const gNight=ctx.createLinearGradient(0,0,0,250);
+  gNight.addColorStop(0,'rgba(99,102,241,.35)');gNight.addColorStop(1,'rgba(99,102,241,.02)');
+
+  const dayData  =hourAvgs.map((v,h)=>h>=6&&h<=17?v:null);
+  const nightData=hourAvgs.map((v,h)=>h<6||h>17?v:null);
+
+  mkLine('h24Chart',labels,[
+    {label:'Ban ngày',  data:dayData,  borderColor:'#f59e0b',borderWidth:2.5,fill:true,backgroundColor:gDay,
+     pointBackgroundColor:dayData.map(v=>aqiColor(v)),pointBorderColor:t.bg,pointBorderWidth:1.5,
+     pointRadius:dayData.map((v,h)=>(h===dayMax.h||h===dayMin.h)?6:2),pointHoverRadius:8,
+     tension:0.45,spanGaps:false},
+    {label:'Ban đêm',  data:nightData,borderColor:'#818cf8',borderWidth:2.5,fill:true,backgroundColor:gNight,
+     pointBackgroundColor:nightData.map(v=>aqiColor(v)),pointBorderColor:t.bg,pointBorderWidth:1.5,
+     pointRadius:nightData.map((v,h)=>(h===nightMax.h||h===nightMin.h)?6:2),pointHoverRadius:8,
+     tension:0.45,spanGaps:false},
+  ],{yTitle:'AQI trung bình',yMin:0,maxTx:24});
+}
+
+// ── DISTRIBUTION ─────────────────────────────────────────────────────────────
+function buildDist(){
+  const d=getSlice();const aqis=d.map(x=>x.AQI).filter(Boolean);const total=aqis.length;
+  const counts = AQI_LEVELS.map(lv => ({
+    ...lv,
+    cnt: aqis.filter(v=>v>=lv.range[0]&&v<=lv.range[1]).length,
+    pct: total ? +(aqis.filter(v=>v>=lv.range[0]&&v<=lv.range[1]).length/total*100).toFixed(1) : 0
+  }));
+  const maxPct = Math.max(...counts.map(c=>c.pct), 1);
+  document.getElementById('distBars').innerHTML = `<div class="dist-chart-wrap">` +
+    counts.map(c => {
+      const barH = Math.max((c.pct / maxPct) * 300, c.pct > 0 ? 10 : 2);
+      return `<div class="dist-col">
+        <div class="dist-cnt-v">${c.cnt}n</div>
+        <div class="dist-bar-v" style="height:${barH}px;background:${c.color}cc;">
+          ${c.pct>0?`<div class="dist-bar-pct" style="color:${c.color}">${c.pct}%</div>`:''}
+        </div>
+        <div class="dist-lbl-v" style="color:${c.color}">${c.label}</div>
+      </div>`;
+    }).join('') + `</div>`;
+}
+
+// ── SCATTER ───────────────────────────────────────────────────────────────────
+function buildScatter(){
+  const d=getSlice();
+  const pts=d.filter(x=>x.PM25!=null&&x.AQI!=null).map(x=>({x:x.PM25,y:x.AQI,c:aqiColor(x.AQI),l:x.date.slice(5).replace('-','/')}));
+  if(charts.scatter){charts.scatter.destroy();delete charts.scatter;}
+  const el=document.getElementById('scatterChart');if(!el)return;
+  const t=tc();
+  charts.scatter=new Chart(el.getContext('2d'),{
+    type:'scatter',
+    data:{datasets:[{data:pts.map(p=>({x:p.x,y:p.y})),pointBackgroundColor:pts.map(p=>p.c),
+      pointBorderColor:t.bg,pointBorderWidth:1.5,pointRadius:5,pointHoverRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:t.bg,borderColor:isDark()?'#1e2d44':'#e4e8f0',
+        borderWidth:1,titleColor:t.title,bodyColor:t.text,
+        callbacks:{label:ctx2=>{const p=pts[ctx2.dataIndex];return`${p.l}: PM2.5 ${p.x} · AQI ${p.y}`;}}
+      }},
+      scales:{
+        x:{title:{display:true,text:'PM2.5 (µg/m³)',color:t.text},ticks:{color:t.text},grid:{color:t.grid}},
+        y:{title:{display:true,text:'AQI',color:t.text},ticks:{color:t.text},grid:{color:t.grid}},
+      }
+    }
+  });
+}
+
+// ── REBUILD ALL ───────────────────────────────────────────────────────────────
+function rebuildAll(){
+  buildSummary();buildTrend();buildCompare();buildCalendar();
+  build24h();buildDist();buildScatter();
+  buildInsightTrend();buildInsightCompare();buildInsight24h();
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+// (filter handled inside unified dropdown)
+
+document.getElementById('metricTabs').addEventListener('click',e=>{
+  const btn=e.target.closest('.pill-btn');if(!btn)return;
+  document.querySelectorAll('#metricTabs .pill-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');curMetric=btn.dataset.m;buildTrend();
+});
+
+document.getElementById('compareMonthTabs').addEventListener('click',e=>{
+  const btn=e.target.closest('.pill-btn');if(!btn)return;
+  document.querySelectorAll('#compareMonthTabs .pill-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');curCompMon=btn.dataset.m;buildCompare();
+});
+
+document.getElementById('calYearTabs').addEventListener('click',e=>{
+  const btn=e.target.closest('.pill-btn');if(!btn)return;
+  document.querySelectorAll('#calYearTabs .pill-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');curCalYear=btn.dataset.yr;buildCalendar();
+});
+document.getElementById('calMetricTabs').addEventListener('click',e=>{
+  const btn=e.target.closest('.pill-btn');if(!btn)return;
+  document.querySelectorAll('#calMetricTabs .pill-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');curCalMet=btn.dataset.m;buildCalendar();
+});
+
+document.getElementById('h24YearTabs').addEventListener('click',e=>{
+  const btn=e.target.closest('.pill-btn');if(!btn)return;
+  document.querySelectorAll('#h24YearTabs .pill-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');cur24Year=btn.dataset.yr;build24h();buildInsight24h();
+});
+
+document.getElementById('themeToggle').addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-t]');if(!btn)return;
+  const t=btn.dataset.t;
+  document.body.classList.toggle('dark',t==='dark');
+  localStorage.setItem('aqi_theme',t);
+  document.querySelectorAll('#themeToggle button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  rebuildAll();
+});
+
+// Init theme
+(()=>{
+  const s=localStorage.getItem('aqi_theme')||'light';
+  document.body.classList.toggle('dark',s==='dark');
+  document.querySelectorAll('#themeToggle button').forEach(b=>b.classList.toggle('active',b.dataset.t===s));
+})();
+
+// GO
+rebuildAll();
+</script>
+</body>
+</html>
